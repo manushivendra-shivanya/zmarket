@@ -30,6 +30,20 @@ Break-even win rate, symmetric win/loss: **w = (cost% / target% + 1) / 2**
 
 **Rule: never target below 0.5%.** Below that, friction decides the outcome, not skill.
 
+**But the table above assumes win == loss, and that is not the plan.** Every trade
+caps both sides — a target and a tighter stop. That is the main lever in this
+whole system:
+
+| Target / Stop | R:R | Break-even win rate |
+|---|---|---|
+| 2.6% / 2.6% | 1:1 | 52.1% |
+| 2.6% / 1.30% | 2:1 | 36.1% |
+| 2.6% / 0.65% | 4:1 | **23.3%** |
+
+At 4:1 you can be wrong three times in four and still profit. **₹1,000/day is
+then a frequency question:** ~3.5 trades/day at 45% accuracy. Run
+`tools/risk_reward.py`.
+
 Full derivation: [`docs/COST-MODEL.md`](docs/COST-MODEL.md).
 
 ## 3. Hard rules
@@ -40,7 +54,9 @@ Full derivation: [`docs/COST-MODEL.md`](docs/COST-MODEL.md).
 2. **Prefer own capital over leverage.** ₹4,000 at 2x and ₹2,000 at 4x are the *same position*
    and the same P&L to the rupee — but a 3% adverse move is 6% of the first and 12% of the
    second. Same return, half the ruin risk. Lower leverage, more capital, always.
-3. **Stop-loss on every entry**, set before the entry, never widened. Ever.
+3. **Stop-loss on every entry**, set before the entry, **never widened. Ever.**
+   Prefer **Cover Orders** — they enforce the stop at entry and remove the choice.
+   Three widened stops turn a ₹5,925 month into ₹1,830.
 4. **Daily loss cap: −₹1,000.** Stop trading for the day. No exceptions, no "one more".
 5. **No averaging down. No revenge trade. No discretionary override** of a systematic signal.
 6. **MIS auto-squares around 15:20.** No strategy may depend on holding past it.

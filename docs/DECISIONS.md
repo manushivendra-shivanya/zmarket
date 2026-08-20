@@ -4,6 +4,42 @@ Dated, with reasoning. Newest first. A decision reversed keeps its original entr
 
 ---
 
+## 2026-08-20 · Cap BOTH sides — asymmetric target and stop is the main lever
+
+**Ruled:** every trade carries a profit target **and** a stop loss, with the stop
+tighter than the target. Prefer Zerodha **Cover Orders**, which enforce a stop at
+entry.
+
+**Reasoning.** Every earlier model in this repo assumed win == loss, which forces
+break-even to ~52%. Capping the downside tighter collapses it:
+
+| Target / Stop | R:R | Win | Loss | Break-even |
+|---|---|---|---|---|
+| 2.6% / 2.6% | 1:1 | +₹997 | −₹1,083 | 52.1% |
+| 2.6% / 1.30% | 2:1 | +₹997 | −₹563 | 36.1% |
+| 2.6% / 0.87% | 3:1 | +₹997 | −₹391 | 28.2% |
+| 2.6% / 0.65% | 4:1 | +₹997 | −₹303 | **23.3%** |
+
+**At 4:1 you can be wrong three times in four and still profit.** The symmetric
+assumption was pessimistic by ~30 percentage points and was simply the wrong
+model.
+
+**₹1,000/day is a FREQUENCY question.** A single 4:1 trade wins at most ₹997, so
+one trade a day cannot reach ₹1,000 even at 100% accuracy. At 4:1 and 45%
+accuracy each trade is worth ₹282, so **~3.5 trades/day** reaches the target —
+which matches the original instinct of splitting ₹10,000 across three or four
+trades.
+
+**The counter-pressure, which only measurement resolves:** a tighter stop is hit
+more often by ordinary noise, so win rate falls as R:R rises. The product is what
+matters and phase 1 is what finds the optimum.
+
+**The rule this makes non-negotiable:** three widened stops turn a ₹5,925 month
+into ₹1,830 — a 69% haircut from three moments of discretion. "Never widen a
+stop" is a hard rule, not a preference, and a Cover Order removes the choice.
+
+---
+
 ## 2026-08-20 · The target is an output of phase 1, not an input
 
 **Ruled:** stop planning around "10% of deployed capital per day". Express the
