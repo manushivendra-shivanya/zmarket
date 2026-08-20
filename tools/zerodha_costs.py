@@ -19,22 +19,34 @@ Intraday = MIS. Delivery = CNC. Not F&O -- those have different tax types
 (CTT vs STT) and this model does not cover them.
 """
 
+# [OK]  = checked against a Zerodha source, with the source named
+# [?]   = assumed. Reconcile via tools/kite_charges.py before phase 2.
 RATES = {
     # --- intraday (MIS) ---
-    "mis_brokerage_pct":  0.0003,     # 0.03% per executed order...
-    "mis_brokerage_cap":  20.0,       # ...or Rs 20, whichever is LOWER, per leg
-    "mis_stt_pct":        0.00025,    # 0.025%, SELL side only
-    "mis_stamp_pct":      0.00003,    # 0.003%, BUY side only
+    "mis_brokerage_pct":  0.0003,     # [OK] 0.03% per executed order...
+    "mis_brokerage_cap":  20.0,       # [OK] ...or Rs 20, whichever is LOWER, per leg.
+                                      #      zerodha.com/charges, verified 2026-08-20:
+                                      #      "Flat Rs 20 or 0.03% (whichever is lower)
+                                      #      per executed order on intraday trades".
+                                      #      So the cap only binds above Rs 66,667/order.
+    "mis_stt_pct":        0.00025,    # [?]  0.025%, SELL side only
+    "mis_stamp_pct":      0.00003,    # [?]  0.003%, BUY side only
     # --- delivery (CNC) ---
-    "cnc_brokerage_pct":  0.0,        # zero brokerage on equity delivery
-    "cnc_stt_pct":        0.001,      # 0.1% on BOTH legs -- verified against docs
-    "cnc_stamp_pct":      0.00015,    # 0.015%, BUY side only
-    "cnc_dp_charge":      15.34,      # FLAT, per scrip, on SELL. Dominates small trades.
+    "cnc_brokerage_pct":  0.0,        # [OK] "All equity delivery investments (NSE, BSE)
+                                      #      are absolutely free - Rs 0 brokerage."
+                                      #      zerodha.com/charges, verified 2026-08-20.
+    "cnc_stt_pct":        0.001,      # [OK] 0.1% per leg. Implied by the API doc example
+                                      #      (SBIN CNC BUY 1 @ 560 -> stt 0.56).
+    "cnc_stamp_pct":      0.00015,    # [?]  0.015%, BUY side only
+    "cnc_dp_charge":      15.34,      # [?]  FLAT per scrip on SELL. Dominates small trades,
+                                      #      so an error here matters most. VERIFY FIRST.
     # --- common ---
-    "exch_txn_pct":       0.0000335,  # NSE 0.00335% -- CORRECTED 2026-08-20
-    "sebi_pct":           0.000001,   # Rs 10/crore
-    "ipft_pct":           0.000001,   # NSE Rs 10/crore
-    "gst_pct":            0.18,       # on brokerage + exchange + SEBI
+    "exch_txn_pct":       0.0000335,  # [OK] NSE 0.00335%. Implied by the API doc example
+                                      #      (exchange_turnover_charge 0.01876 on 560).
+                                      #      Was hardcoded at the stale 0.00297%.
+    "sebi_pct":           0.000001,   # [OK] Rs 10/crore. Same doc example (0.00056 on 560).
+    "ipft_pct":           0.000001,   # [?]  NSE Rs 10/crore
+    "gst_pct":            0.18,       # [?]  on brokerage + exchange + SEBI
 }
 
 

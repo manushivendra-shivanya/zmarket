@@ -9,15 +9,24 @@ Not F&O. Not delivery — no DP charges here, those apply only on a delivery sel
 
 ## 1. The charges
 
-| Charge | Rate | Applies to |
-|---|---|---|
-| Brokerage | 0.03% **or ₹20, whichever is lower** | each leg |
-| STT | 0.025% | **sell side only** |
-| Exchange transaction (NSE) | 0.00297% | both sides |
-| SEBI | ₹10/crore | both sides |
-| IPFT (NSE) | ₹10/crore | both sides |
-| Stamp duty | 0.003% | **buy side only** |
-| GST | 18% | on brokerage + exchange + SEBI |
+**Verification key:** ✅ checked against a named Zerodha source · ❓ assumed, reconcile
+via `tools/kite_charges.py` before phase 2.
+
+| Charge | Rate | Applies to | |
+|---|---|---|---|
+| Brokerage (intraday) | 0.03% **or ₹20, whichever is lower** | each leg | ✅ |
+| Brokerage (delivery) | **₹0** | — | ✅ |
+| STT (intraday) | 0.025% | **sell side only** | ❓ |
+| Exchange transaction (NSE) | 0.00335% | both sides | ✅ |
+| SEBI | ₹10/crore | both sides | ✅ |
+| IPFT (NSE) | ₹10/crore | both sides | ❓ |
+| Stamp duty | 0.003% | **buy side only** | ❓ |
+| GST | 18% | on brokerage + exchange + SEBI | ❓ |
+| **DP charge (delivery)** | **flat ₹15.34/scrip** | **sell only** | ❓ **verify first** |
+
+The DP charge is the one to check hardest: being flat, it is 70% of the cost of a
+₹3,000 delivery round trip, so an error there moves the swing-trading conclusion
+more than any percentage rate can.
 
 ## 2. Round-trip cost by position size
 
