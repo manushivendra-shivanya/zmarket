@@ -33,6 +33,33 @@ REDIRECT = f"http://127.0.0.1:{PORT}/"     # register EXACTLY this as redirect_u
 CACHE = pathlib.Path(__file__).resolve().parent.parent / ".kite_session.json"
 
 
+def public_ip():
+    """Current public IPv4, or None. Only matters if an IP whitelist is set on
+    the Kite app -- a rotated IP fails auth in a way that looks like a code bug."""
+    import urllib.request
+    try:
+        with urllib.request.urlopen("https://api.ipify.org", timeout=5) as r:
+            return r.read().decode().strip()
+    except Exception:
+        return None
+
+
+def warn_if_ip_moved():
+    """If KITE_WHITELISTED_IP is set, say so loudly when the ISP has moved us.
+
+    Airtel/Jio home broadband hands out DYNAMIC public IPs. If you whitelisted
+    one on the Kite app, a lease renewal or router reboot silently breaks every
+    API call. Better to be told here than to debug working code.
+    """
+    expected = os.environ.get("KITE_WHITELISTED_IP")
+    if not expected:
+        return
+    now = public_ip()
+    if now and now != expected:
+        print(f"  !! Public IP is {now}, whitelist expects {expected}.")
+        print(f"  !! Update it at developers.kite.trade or auth will fail.")
+
+
 def cached_token():
     """Today's token, or None. Tokens die at the next trading day."""
     if not CACHE.exists():
@@ -81,6 +108,7 @@ def _capture_request_token(api_key):
 
 def login(force=False):
     """Return a valid access_token, reusing today's cached one unless force."""
+    warn_if_ip_moved()
     if not force:
         tok = cached_token()
         if tok:

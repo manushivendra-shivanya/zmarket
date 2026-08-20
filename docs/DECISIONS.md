@@ -4,6 +4,45 @@ Dated, with reasoning. Newest first. A decision reversed keeps its original entr
 
 ---
 
+## 2026-08-20 · Friends get their own Kite app — the terms say so explicitly
+
+**Ruled:** each person runs their own signup, own API key, own account. The code
+is shareable; the key, the app and order placement are not.
+
+**Reasoning.** The developers.kite.trade signup carries this checkbox:
+
+> *"I confirm that the above static IPs will be used exclusively by me and/or
+> **my immediate family**."*
+
+That settles a question this repo had only speculated about. It is not a SEBI
+grey area to be interpreted — **friends are not immediate family**, and sharing
+one app with them breaches the agreement directly. Earlier notes here framed it
+as a regulatory judgement call; Zerodha's own terms are narrower than SEBI's
+framework and are the binding constraint.
+
+---
+
+## 2026-08-20 · Leave the IP whitelist blank
+
+**Ruled:** no IP whitelist on the Kite app.
+
+**Reasoning.** The signup asks for **static** IPs. Measured on the actual
+connection: `curl ifconfig.me` returns IPv6 (`2401:4900:…`, Jio, with privacy
+extensions that rotate on their own) and `curl -4 ifconfig.me` returns
+`122.162.148.33` — Airtel, a real public IPv4 rather than CGNAT, so it *would*
+work. But Airtel home broadband is **dynamic**; it holds for days or weeks and
+then moves on a lease renewal or router reboot.
+
+A stale whitelist entry fails auth in a way that looks exactly like a code bug,
+and static IPs cost ~₹500+/month — landing straight back on the fixed-cost
+problem. Blank is correct here, not a compromise.
+
+**Mitigation if a whitelist is ever set:** `KITE_WHITELISTED_IP` in `.env` makes
+`tools/auth.py` warn on mismatch at login, so a rotated IP reads as an ISP event
+instead of a debugging session.
+
+---
+
 ## 2026-08-20 · Cap BOTH sides — asymmetric target and stop is the main lever
 
 **Ruled:** every trade carries a profit target **and** a stop loss, with the stop
