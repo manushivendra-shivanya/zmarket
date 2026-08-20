@@ -106,6 +106,18 @@ currently zero. The two are unrelated.
 
 ## 6. Regulatory position
 
+### 6.0 SEBI static-IP mandate — LIVE since 1 April 2026
+
+**API orders from an unregistered static IP are rejected.** Not upcoming; in force.
+Market data appears exempt (the rule names *orders*) but **that reading is
+unverified**.
+
+Consequence, and it is load-bearing: **phases 1 and 2 are unaffected** because both
+read data and execute manually. **Automated execution is blocked** until a static IP
+exists — an ISP add-on at ~₹500–1,500/month or a cloud VM at ~₹400–800/month, which
+on ₹10,000 capital is ≥5%/month before a single trade. Do not buy one speculatively.
+
+
 Self-directed algos on **your own account** through your own broker's API are permitted. SEBI's
 February 2025 framework targets algo **providers and vendors**, with broker-registration and
 exchange-approval thresholds keyed to order rates far above this volume.

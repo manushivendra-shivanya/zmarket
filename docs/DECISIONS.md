@@ -4,6 +4,52 @@ Dated, with reasoning. Newest first. A decision reversed keeps its original entr
 
 ---
 
+## 2026-08-20 · SEBI static-IP mandate — already in force, and it decides the architecture
+
+**The fact.** developers.kite.trade carries this banner:
+
+> *"Starting **April 1, 2026**, API orders not placed from a registered static IP
+> will be **rejected** as per SEBI regulations. You can now register your static
+> IP from your profile page."*
+
+**Today is 2026-08-20. That deadline passed nearly five months ago — this is live,
+not upcoming.** It reverses the blank-whitelist ruling made hours earlier on this
+same page, which was based on the signup form's wording without reading the
+banner above it.
+
+**What it changes, and what it does not.** The notice is specific: *API **orders***
+are rejected. It does not say market data is. So the split is:
+
+| API use | Needs a registered static IP? |
+|---|---|
+| Quotes, historical data, instrument lists, WebSocket ticks | **Apparently not** — needs verification |
+| **Placing, modifying or cancelling orders** | **Yes. Rejected without one.** |
+
+**Why this strengthens rather than breaks the plan.** Execution was already ruled
+manual (2 trades/day is two taps in the Kite app; automation earns nothing at this
+frequency). That decision now also **defers the entire static-IP problem**:
+
+- **Phase 1** — signal logger, data only. **Unaffected.** No static IP, no order API.
+- **Phase 2** — live micro-size, manual entry. **Unaffected.** Orders go through the
+  Kite app, not the API, so the mandate does not bite.
+- **Phase 3+ / automated execution** — **blocked** until a static IP exists.
+
+**The cost this would add if execution were ever automated.** The measured
+connection is Airtel dynamic (`122.162.148.33`). A static IP is an ISP add-on at
+roughly ₹500–1,500/month, or a cloud VM with a fixed address at ₹400–800/month —
+and the VM route also reintroduces an always-on runtime to maintain. Either lands
+straight back on the fixed-cost problem: on ₹10,000 of capital, ₹500/month is 5%
+per month before any trade. **Do not buy one speculatively.**
+
+**Registration is on the Kite profile page**, not per-app. As of this entry: 0 apps
+created, Billing (0) — nothing has been charged.
+
+**Open:** confirm whether *market data* calls are genuinely exempt. The whole
+phase-1/phase-2 plan rests on that reading of the word "orders", and it has not
+been tested against a live key.
+
+---
+
 ## 2026-08-20 · Friends get their own Kite app — the terms say so explicitly
 
 **Ruled:** each person runs their own signup, own API key, own account. The code
@@ -22,9 +68,12 @@ framework and are the binding constraint.
 
 ---
 
-## 2026-08-20 · Leave the IP whitelist blank
+## 2026-08-20 · Leave the IP whitelist blank — **REVERSED same day, see below**
 
-**Ruled:** no IP whitelist on the Kite app.
+**Superseded by the SEBI static-IP entry above.** Kept per this file's rule that a
+reversed decision keeps its original entry.
+
+**Was ruled:** no IP whitelist on the Kite app.
 
 **Reasoning.** The signup asks for **static** IPs. Measured on the actual
 connection: `curl ifconfig.me` returns IPv6 (`2401:4900:…`, Jio, with privacy
