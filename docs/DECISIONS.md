@@ -4,6 +4,57 @@ Dated, with reasoning. Newest first. A decision reversed keeps its original entr
 
 ---
 
+## 2026-08-20 · There is a FREE tier — create Personal, defer Connect
+
+**The fact.** The create-app form offers three types, and the ₹2,000/month figure
+this repo used throughout was never verified and is wrong in both structure and
+applicability:
+
+| Type | Cost | Gives | Withholds |
+|---|---|---|---|
+| **Connect** | **500 credits / 30 days** — a credit model, **rate unknown** | Trading + historical chart data + live quotes & WebSockets | — |
+| **Personal** | **Free** | Investing, trading, reports APIs | **No historical data, no live quotes, no WebSockets** |
+| **Publisher** | Free | HTML/JS order buttons | No API access at all |
+
+**Ruled: create Personal.** Reasons, in order:
+
+1. **No Kite market data is needed yet.** Phase 1 is a signal logger and runs on
+   free sources (NSE bhavcopy, yfinance). Paying for tick data before knowing
+   whether a signal exists is backwards.
+2. **"Reports APIs" should cover `/charges/orders`**, so `tools/kite_charges.py`
+   can reconcile the offline cost model against Zerodha's own numbers **for ₹0** —
+   closing the stale-rate problem that this repo already hit once. *(Unverified:
+   "reports" may not include the charges endpoint.)*
+3. **Order APIs are included**, so automation is not foreclosed.
+4. **It costs nothing.** There is no downside to creating it now.
+
+**Connect is deferred**, not rejected. Its entire advantage is live ticks and
+historical data, and there is no strategy to feed them to. Upgrade when phase 1
+produces a hit rate worth streaming for.
+
+**Redirect URL: `http://127.0.0.1:8765/`** — exactly what `tools/auth.py` listens
+on. Setting it correctly at creation avoids a re-registration later.
+
+### What this corrects elsewhere in this repo
+
+The ₹2,000/month figure appears in several earlier entries and in
+`docs/COST-MODEL.md` §5. It was **assumed from general knowledge and never
+checked**, and the free tier means it was not merely imprecise but the wrong
+question. Specifically:
+
+- **"₹40,000 is your break-even capital"** — that conclusion existed *only*
+  because of an assumed monthly fee. **At ₹0 it does not hold**, and the
+  fee-free tables in `COST-MODEL.md` §4 are the operative ones.
+- **"The fee eats 33–302% of gross edge"** — now a **conditional**, not a live
+  constraint. It stays in the file as the argument for *why* Connect is deferred.
+- The SEBI static-IP entry is **unaffected** — that is a rule about orders, not
+  about tier.
+
+**Open:** the credit→rupee rate for Connect. Check the Billing tab before any
+upgrade decision.
+
+---
+
 ## 2026-08-20 · SEBI static-IP mandate — already in force, and it decides the architecture
 
 **The fact.** developers.kite.trade carries this banner:

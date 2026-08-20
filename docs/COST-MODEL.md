@@ -85,7 +85,14 @@ Monthly, 42 trades (2/day × 21 days), **no API fee**:
 | ₹4,000 2x @₹200 | 483 | 1,323 | 2,163 | 3,003 | 4,683 |
 | ₹4,000 4x @₹200 | 966 | 2,646 | 4,326 | 6,006 | 9,366 |
 
-## 5. Platform fees — kept out of the base case on purpose
+## 5. Platform fees — ₹0 on the free tier
+
+> **Corrected 2026-08-20.** This section originally argued against a ₹2,000/month
+> subscription. That figure was **assumed and never verified**. Kite Connect has a
+> **free Personal tier** (trading + reports APIs, no market data), which is the tier
+> in use. The tables below are retained as the argument for why the paid **Connect**
+> tier stays deferred — not as a live cost. See `docs/DECISIONS.md`.
+
 
 **Everything in §4 is fee-free, and that is the real plan.** No API subscription is being bought
 (`PLAN.md` §5), so no platform fee belongs in the numbers you actually plan against.

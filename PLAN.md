@@ -88,21 +88,26 @@ something that does not survive contact with a real order book.
 ### Phase 3 — scale to ₹10,000/day
 Only if phase 2 clears the break-even row for the intended target size.
 
-## 5. No platform subscription — decided 2026-08-20
+## 5. Platform tier — Personal (free), decided 2026-08-20
 
-**Fee is ₹0. Nothing is subscribed, and the plan does not assume one.**
+**Fee is ₹0.** Kite Connect has three app types and **Personal is free**: investing,
+trading and reports APIs, with **no historical data and no live quotes/WebSockets**.
+That is the right tier for now, because phase 1 needs no Kite market data — it runs
+on free sources — and Personal still exposes `/charges/orders`, so the cost model can
+be reconciled against Zerodha's own numbers at no cost.
 
-Two trades a day is manual execution — two taps in the Kite app. An API subscription earns its
-keep at 50 trades/day or many simultaneous instruments, and neither describes this. Modelled at a
-strong 70% hit rate, a ~₹2,000/month fee would consume **33–302% of gross edge** at these
-position sizes, and at ₹2,000 own × 2x on a ₹400 share it would lose money even at an 80% win
-rate. See `docs/COST-MODEL.md` §5.
+**Connect is deferred, not rejected.** It is a credit model ("500 credits for 30
+days"; **rate unverified — check the Billing tab**) and its only advantage is ticks
+and historical data. Upgrade when phase 1 produces a hit rate worth streaming for.
 
-Phases 1 and 2 both run on free data (NSE bhavcopy, yfinance) with manual entry.
+**Correction:** earlier versions of this plan assumed ₹2,000/month and concluded
+"₹40,000 is the break-even capital". **That was an unverified figure and the
+conclusion does not hold at ₹0.** See `docs/DECISIONS.md`.
 
-**Vocabulary, to stop a mix-up that already happened once:** "₹2,000–4,000" in this repo always
-means **per-trade own capital**. Any monthly platform charge is called a **platform fee** and is
-currently zero. The two are unrelated.
+**Redirect URL: `http://127.0.0.1:8765/`** — what `tools/auth.py` listens on.
+
+Execution stays manual regardless: 2–4 trades/day is two taps in the Kite app, and
+automated order placement is blocked by §6.0 anyway.
 
 ## 6. Regulatory position
 
