@@ -3,11 +3,9 @@
 Systematic intraday equity trading. Personal capital, personal account.
 
 **Not a product. Not a service. Not offered to anyone.** Any reconsideration of
-that is a 2028 question at the earliest, and only if the numbers earn it.
+that is a 2027 question at the earliest, and only if the numbers earn it.
 
-**Deliberately separate from `nutridiet-app`.** That repo carries health data,
-DPDP obligations and RLS; nothing about the market belongs in it, and broker
-credentials must never sit beside Supabase keys.
+
 
 ## Start here
 
