@@ -1,0 +1,25 @@
+# CREDENTIALS — never commit. Kite API key/secret/access token, request token.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+kite_*.json
+access_token*
+credentials*
+
+# Data and results — regenerate, don't version
+data/
+*.csv
+*.parquet
+*.db
+*.sqlite3
+signals_*.json
+
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+.DS_Store
+.kite_session.json
