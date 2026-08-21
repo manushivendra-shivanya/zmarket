@@ -4,48 +4,6 @@ Dated, with reasoning. Newest first. A decision reversed keeps its original entr
 
 ---
 
-## 2026-08-20 · The "immediate family" clause kills key-sharing with friends
-
-**The fact.** The Kite Connect signup terms require ticking:
-
-> *"I confirm that the above static IPs will be used exclusively by me **and/or my
-> immediate family**."*
-
-**Friends are not immediate family.** This is not a SEBI grey area to reason about —
-it is a direct term of the agreement, and it settles a question this repo had been
-treating as open.
-
-**Ruled:** each person runs their **own** signup, own API key, own IP, own account.
-The *code* may be shared — it is ours. The key, the app, and order placement in
-anyone else's account may not.
-
-This is narrower than the earlier regulatory note, which worried about SEBI's algo
-framework. That framework is still the right frame for *distribution*; this clause
-binds first and is unambiguous.
-
----
-
-## 2026-08-20 · IP whitelist — leave blank if the form allows it
-
-**Reasoning.** The field wants **static** IPs. Indian home broadband (Airtel, Jio
-Fiber, ACT) is almost always **dynamic** — it rotates on router reboot or lease
-renewal. Whitelisting today's address means every API call starts failing on a day
-you did not change anything, which reads as a code bug and is not one.
-
-**Ruled, in order of preference:**
-1. **Leave blank** if the form accepts it — any IP then works.
-2. If mandatory, use the current `curl ifconfig.me` value and expect to edit it.
-3. **Do not buy a static IP** (₹500–1,500/month) or spin up a cloud VM to get one.
-   Both land straight back on the fixed-cost problem, for a personal setup.
-
-Trade-off accepted: blank means a leaked `api_key` + `api_secret` is usable from
-anywhere. For a personal setup with the key in a gitignored `.env`, that beats
-automation that silently breaks. It is also why `.env` discipline is a hard rule.
-
-**Redirect URL: `http://127.0.0.1:8765/`** — must match `tools/auth.py` exactly.
-
----
-
 ## 2026-08-20 · There is a FREE tier — create Personal, defer Connect
 
 **The fact.** The create-app form offers three types, and the ₹2,000/month figure
