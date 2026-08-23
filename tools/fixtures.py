@@ -17,6 +17,7 @@ Nothing in this file models a real market. It is a calibration weight, not data.
 import math
 import random
 
+from portfolio import MinuteBar
 from strategies import Bar
 
 
@@ -61,3 +62,29 @@ def universe(n_symbols=12, n=750, seed=0, **kw):
                                 start=200 + k * 90, **kw)
         out[sym] = bars
     return out
+
+
+def intraday(symbol, start, daily_vol_pct=1.8, minutes=375, seed=0, drift_pct=0.0):
+    """One session of minute bars as a driftless random walk.
+
+    Daily volatility is spread over the session by sqrt(time), which is the
+    correct scaling for a random walk -- per-minute sigma = daily / sqrt(375).
+    Getting that wrong is the usual way a synthetic session ends up far too
+    calm or far too wild to reason about.
+
+    Structureless ON PURPOSE. Used as the null for the intraday engine exactly
+    as random_walk() is for the daily one.
+    """
+    import math as _m
+    rng = random.Random(seed)
+    sigma = (daily_vol_pct / 100) / _m.sqrt(minutes)
+    mu = (drift_pct / 100) / minutes
+    bars, px = [], start
+    for i in range(minutes):
+        o = px
+        px = max(0.5, o * math.exp(rng.gauss(mu, sigma)))
+        span = abs(rng.gauss(0, sigma * 0.6))
+        hi = max(o, px) * math.exp(span)
+        lo = min(o, px) * math.exp(-span)
+        bars.append(MinuteBar(i, round(o, 2), round(hi, 2), round(lo, 2), round(px, 2)))
+    return bars
