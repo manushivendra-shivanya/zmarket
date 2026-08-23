@@ -15,16 +15,23 @@ that is a 2027 question at the earliest, and only if the numbers earn it.
 | [`docs/COST-MODEL.md`](docs/COST-MODEL.md) | What a trade actually costs, and the break-even it implies |
 | [`docs/DECISIONS.md`](docs/DECISIONS.md) | Dated rulings, with the reasoning |
 | [`docs/PHASE-1-SPEC.md`](docs/PHASE-1-SPEC.md) | The signal logger — spec, not built |
+| [`docs/STRATEGY.md`](docs/STRATEGY.md) | The strategy catalogue, the four models, and what friction really costs |
 | [`tools/zerodha_costs.py`](tools/zerodha_costs.py) | Cost calculator — **the only place rates live** |
 | [`tools/verify_docs.py`](tools/verify_docs.py) | Checks every figure in the docs against the model. Exits 1 on drift |
 | [`tools/scenario.py`](tools/scenario.py) | P&L model for a given position size and win rate |
 | [`tools/stats.py`](tools/stats.py) | Wilson score interval — hit rates with an error bar |
+| [`tools/strategies.py`](tools/strategies.py) | Pluggable rule catalogue — 6 runnable, 2 blocked on paid data |
+| [`tools/backtest.py`](tools/backtest.py) | Runs any rule on daily bars, 4-outcome scoring, leaderboard |
+| [`tools/selftest.py`](tools/selftest.py) | **Null test** — proves the engine finds no edge where none exists |
 
 ```bash
 python3 tools/zerodha_costs.py     # cost table + break-even win rates
 python3 tools/verify_docs.py       # run after ANY rate or doc change
 python3 tools/scenario.py          # monthly P&L across win rates
 python3 tools/stats.py             # why 12/20 is not a 60% edge
+python3 tools/strategies.py        # the catalogue
+python3 tools/selftest.py          # ALWAYS run before trusting a backtest
+python3 tools/backtest.py data/*.csv
 ```
 
 No dependencies. Standard library only.

@@ -58,6 +58,21 @@ def be_asym(target_pct, stop_pct, pos):
     return loss / (win + loss) * 100
 
 
+def friction_month(pos, trades_per_day, days=21):
+    return round_trip(pos)["total"] * trades_per_day * days
+
+
+def trades_to_prove(observed, breakeven):
+    """Decisive trades until the Wilson floor clears break-even."""
+    n = 10
+    while n < 200_000:
+        lo, _ = wilson_interval(round(observed * n), n)
+        if lo > breakeven:
+            return n
+        n += 10
+    return None
+
+
 def rr_win(pos, target_pct=2.6):
     return pos * target_pct / 100 - round_trip(pos)["total"]
 
@@ -158,6 +173,29 @@ CHECKS = [
      r"\| ₹8,000 — §1 typical \|.*?\| \*\*([\d.]+)\*\* \|", rr_freq(8_000)),
     ("PLAN.md", "S8 daily cap vs 4:1 stop",
      r"the −₹1,000 cap in §3 trips after \*\*([\d.]+) losing", 1_000 / rr_loss(40_000)),
+
+    # ---- STRATEGY.md S1: the friction bill and the sample-size table ----
+    ("docs/STRATEGY.md", "S1 friction, Rs40k x1/day",
+     r"\| ₹40,000 \| 1 \| ₹([\d,]+) \|", friction_month(40_000, 1)),
+    ("docs/STRATEGY.md", "S1 friction, Rs40k x3.5/day",
+     r"\| ₹40,000 \| 3\.5 \| \*\*₹([\d,]+)\*\*", friction_month(40_000, 3.5)),
+    ("docs/STRATEGY.md", "S1 friction, Rs16k x3.5/day",
+     r"\| ₹16,000 \| 3\.5 \| ₹([\d,]+) \|", friction_month(16_000, 3.5)),
+    ("docs/STRATEGY.md", "S1 friction as % of capital, Rs40k x3.5",
+     r"\| ₹40,000 \| 3\.5 \| \*\*₹[\d,]+\*\* \| \*\*([\d.]+)%\*\*",
+     friction_month(40_000, 3.5) / 10_000 * 100),
+    ("docs/STRATEGY.md", "S1 months to burn Rs10,000 capital",
+     r"the ₹10,000 capital in ([\d.]+) months", 10_000 / friction_month(40_000, 3.5)),
+    ("docs/STRATEGY.md", "S1 months to burn Rs40,000 contributions",
+     r"contributions in\s+([\d.]+)\.", 40_000 / friction_month(40_000, 3.5)),
+    ("docs/STRATEGY.md", "S1 trades to prove 55% at 1:1",
+     r"\| 55% \| 52\.1% \(1:1\) \| \*\*([\d,]+)\*\*", trades_to_prove(0.55, 0.521)),
+    ("docs/STRATEGY.md", "S1 trades to prove 60% at 1:1",
+     r"\| 60% \| 52\.1% \(1:1\) \| ([\d,]+) \|", trades_to_prove(0.60, 0.521)),
+    ("docs/STRATEGY.md", "S1 trades to prove 45% at 4:1",
+     r"\| 45% \| 23\.3% \(4:1\) \| \*\*([\d,]+)\*\*", trades_to_prove(0.45, 0.233)),
+    ("docs/STRATEGY.md", "S1 trades to prove 30% at 4:1",
+     r"\| 30% \| 23\.3% \(4:1\) \| ([\d,]+) \|", trades_to_prove(0.30, 0.233)),
 
     ("docs/DECISIONS.md", "rate-correction entry, post-fix cost",
      r"intraday round trip moved [\d.]+% → \*\*([\d.]+)%\*\*", cost_pct()),
