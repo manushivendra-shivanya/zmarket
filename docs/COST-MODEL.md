@@ -1,6 +1,6 @@
 # Cost model — Zerodha equity intraday
 
-**Computed 2026-08-20.** Rates as understood at that date. **Verify against
+**Computed 2026-08-20, tables regenerated 2026-08-23.** Rates as understood at that date. **Verify against
 zerodha.com/charges before risking money** — they change, and a stale rate makes the model worse
 than no model. Every rate is isolated in `RATES` at the top of `tools/zerodha_costs.py`; correct
 one number and re-run everything.
@@ -30,22 +30,29 @@ more than any percentage rate can.
 
 ## 2. Round-trip cost by position size
 
+> **Regenerated 2026-08-23.** Every figure in §2, §3 and §4 was still the
+> **pre-correction 0.1062%** basis. `DECISIONS.md` records the NSE turnover
+> charge being fixed (0.00297% → 0.00335%, moving the round trip to
+> **0.1071%**) and `tools/zerodha_costs.py` was updated — but these hand-typed
+> tables were not, and nothing was checking. They are now generated from the
+> model and guarded by `tools/verify_docs.py`.
+
 | Position | Brokerage | STT | Other | GST | **Total** | **% of position** |
 |---|---|---|---|---|---|---|
-| ₹5,000 | 3.00 | 1.25 | 0.47 | 0.60 | **₹5.31** | **0.1062%** |
-| ₹10,000 | 6.00 | 2.50 | 0.93 | 1.19 | **₹10.62** | **0.1062%** |
-| ₹25,000 | 15.00 | 6.25 | 2.33 | 2.98 | **₹26.56** | **0.1062%** |
-| ₹50,000 | 30.00 | 12.50 | 4.67 | 5.95 | **₹53.12** | **0.1062%** |
-| ₹66,667 | 40.00 | 16.67 | 6.23 | 7.94 | **₹70.83** | **0.1062%** |
-| ₹100,000 | 40.00 | 25.00 | 9.34 | 8.31 | **₹82.65** | 0.0826% |
-| ₹500,000 | 40.00 | 125.00 | 46.70 | 12.73 | **₹224.43** | 0.0449% |
+| ₹5,000 | 3.00 | 1.25 | 0.51 | 0.60 | **₹5.36** | **0.1071%** |
+| ₹10,000 | 6.00 | 2.50 | 1.01 | 1.20 | **₹10.71** | **0.1071%** |
+| ₹25,000 | 15.00 | 6.25 | 2.53 | 3.01 | **₹26.79** | **0.1071%** |
+| ₹50,000 | 30.00 | 12.50 | 5.05 | 6.02 | **₹53.57** | **0.1071%** |
+| ₹66,667 | 40.00 | 16.67 | 6.73 | 8.03 | **₹71.43** | **0.1071%** |
+| ₹100,000 | 40.00 | 25.00 | 10.10 | 8.44 | **₹83.54** | 0.0835% |
+| ₹500,000 | 40.00 | 125.00 | 50.50 | 13.41 | **₹228.91** | 0.0458% |
 
 **The percentage is flat below ₹66,667 per order.** Brokerage is 0.03% *or* ₹20/leg whichever is
 lower, so the ₹20 cap does not bind until ₹66,667 turnover. Below that you pay the percentage and
 position size buys you nothing. Above it, cost per rupee starts falling.
 
 **Practical consequence:** at ₹4,000–16,000 positions there is no size advantage to chase. Cost
-is a fixed 0.1062% tax on every round trip regardless of how the position is assembled.
+is a fixed 0.1071% tax on every round trip regardless of how the position is assembled.
 
 ## 3. Break-even win rate
 
@@ -55,17 +62,17 @@ With average win = average loss = target `T`, cost `c` per round trip:
 w·T − (1−w)·T − c = 0     →     w = (c/T + 1) / 2
 ```
 
-At c = 0.1062%:
+At c = 0.1071%:
 
 | Target move | On a ₹400 share | Win rate needed | |
 |---|---|---|---|
-| 0.10% | ₹0.40 | **103.1%** | impossible |
-| 0.20% | ₹0.80 | **76.6%** | dead on arrival |
-| 0.25% | ₹1.00 | 71.2% | very hard |
-| 0.50% | ₹2.00 | 60.6% | |
+| 0.10% | ₹0.40 | **103.6%** | impossible |
+| 0.20% | ₹0.80 | **76.8%** | dead on arrival |
+| 0.25% | ₹1.00 | 71.4% | very hard |
+| 0.50% | ₹2.00 | 60.7% | |
 | 0.75% | ₹3.00 | 57.1% | |
-| **1.00%** | **₹4.00** | **55.3%** | the realistic floor |
-| 1.50% | ₹6.00 | 53.5% | |
+| **1.00%** | **₹4.00** | **55.4%** | the realistic floor |
+| 1.50% | ₹6.00 | 53.6% | |
 | 2.00% | ₹8.00 | 52.7% | |
 | 3.00% | ₹12.00 | 51.8% | |
 
@@ -78,12 +85,12 @@ expensive thing you can do, because friction is constant and the edge shrinks.
 
 | Own × Lev | Position | Price | Shares | Cost | Win | Loss | B/E |
 |---|---|---|---|---|---|---|---|
-| ₹2,000 × 2 | ₹4,000 | ₹200 | 20 | 4.25 | +96 | −104 | 52.1% |
-| ₹2,000 × 2 | ₹4,000 | ₹400 | 10 | 4.25 | +46 | −54 | 54.2% |
-| ₹2,000 × 4 | ₹8,000 | ₹400 | 20 | 8.50 | +92 | −108 | 54.2% |
-| ₹4,000 × 2 | ₹8,000 | ₹400 | 20 | 8.50 | +92 | −108 | 54.2% |
-| ₹4,000 × 4 | ₹16,000 | ₹200 | 80 | 17.00 | +383 | −417 | 52.1% |
-| ₹4,000 × 4 | ₹16,000 | ₹400 | 40 | 17.00 | +183 | −217 | 54.2% |
+| ₹2,000 × 2 | ₹4,000 | ₹200 | 20 | 4.29 | +96 | −104 | 52.1% |
+| ₹2,000 × 2 | ₹4,000 | ₹400 | 10 | 4.29 | +46 | −54 | 54.3% |
+| ₹2,000 × 4 | ₹8,000 | ₹400 | 20 | 8.57 | +91 | −109 | 54.3% |
+| ₹4,000 × 2 | ₹8,000 | ₹400 | 20 | 8.57 | +91 | −109 | 54.3% |
+| ₹4,000 × 4 | ₹16,000 | ₹200 | 80 | 17.14 | +383 | −417 | 52.1% |
+| ₹4,000 × 4 | ₹16,000 | ₹400 | 40 | 17.14 | +183 | −217 | 54.3% |
 
 Monthly, 42 trades (2/day × 21 days), **no API fee**:
 

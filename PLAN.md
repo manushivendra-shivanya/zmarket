@@ -1,6 +1,6 @@
 # zmarket — plan
 
-**Last updated:** 2026-08-20 · **Status:** nothing built, no capital deployed.
+**Last updated:** 2026-08-23 · **Status:** nothing built, no capital deployed.
 
 ## 1. Scope
 
@@ -15,7 +15,7 @@ each need their own cost model before being considered — the numbers here do n
 
 ## 2. What a trade costs — the number everything hangs on
 
-**Round trip = 0.1062% of position value.** Flat below ₹66,667 per order, so a ₹4,000 position
+**Round trip = 0.1071% of position value.** Flat below ₹66,667 per order, so a ₹4,000 position
 and a ₹50,000 position cost the same percentage. Relief only past that threshold (0.083% at ₹1L,
 0.045% at ₹5L) where the ₹20/leg brokerage cap starts to bind.
 
@@ -23,9 +23,9 @@ Break-even win rate, symmetric win/loss: **w = (cost% / target% + 1) / 2**
 
 | Target move | Win rate needed |
 |---|---|
-| 0.20% | **76.6%** — dead on arrival |
-| 0.50% | 60.6% |
-| 1.00% | 55.3% |
+| 0.20% | **76.8%** — dead on arrival |
+| 0.50% | 60.7% |
+| 1.00% | 55.4% |
 | 2.00% | 52.7% |
 
 **Rule: never target below 0.5%.** Below that, friction decides the outcome, not skill.
@@ -67,7 +67,7 @@ Full derivation: [`docs/COST-MODEL.md`](docs/COST-MODEL.md).
 
 ### Phase 1 — signal logger · ₹0, no subscription, no capital
 Record every candidate entry: timestamp, symbol, price, direction, **reason**, target %, stop %.
-Score against what actually happened, minus 0.1062%.
+Score against what actually happened, minus 0.1071%.
 
 **Exit gate:** 100+ logged signals and a measured hit rate with a confidence interval.
 
@@ -75,7 +75,7 @@ This is the only phase that matters right now. Everything downstream is an assum
 produces a number.
 
 ### Phase 2 — live micro-size · ₹1,000–2,000 positions, one month
-Real money, real fills, real queue position, real psychology. Costs are still 0.1062%, so the
+Real money, real fills, real queue position, real psychology. Costs are still 0.1071%, so the
 economics are identical to full size — only the rupee loss is smaller.
 
 **This is deliberately not paper trading.** Paper trading models neither slippage nor partial
@@ -148,6 +148,34 @@ this lose" analysis over the accumulated signal log. That last one is the real p
 structured log is exactly the input an LLM is good at reading.
 
 ## 8. Open questions
+
+- **UNRESOLVED — per-trade size contradicts the ₹1,000/day frequency claim.** Found
+  2026-08-23. §1 caps a trade at ₹2,000–4,000 own capital → a **₹4,000–16,000
+  position**. But `tools/risk_reward.py` and `tools/daily_target.py` both hardcode
+  `POS = ₹40,000` (₹10,000 own at 4x — **the entire day's capital in one trade**), and
+  every headline number flows from that: +₹997 win, −₹303 loss, "~3.5 trades/day
+  reaches ₹1,000" — which `DECISIONS.md` and §2 above both quote as settled.
+
+  At the sizing §1 actually specifies, that conclusion does not hold:
+
+  | Position | 4:1 win | 4:1 loss | EV @45% | Trades/day for ₹1,000 |
+  |---|---|---|---|---|
+  | ₹40,000 — what the tools assume | +₹997 | −₹303 | ₹282 | **3.5** |
+  | ₹16,000 — §1 maximum | +₹399 | −₹121 | ₹113 | **8.9** |
+  | ₹8,000 — §1 typical | +₹199 | −₹61 | ₹56 | **17.7** |
+
+  The two are only compatible if the full ₹40,000 is redeployed **sequentially**, one
+  trade at a time — which no doc states, and which sits badly against "splitting
+  ₹10,000 across three or four trades" in the same `DECISIONS.md` entry. **Needs an
+  owner ruling.** Until then the R:R tables should be read as *"₹40,000 single
+  position"*, not as *"the plan"*.
+
+- **Related, and unmodelled: the daily loss cap collides with the frequency target.**
+  At ₹40,000 the 4:1 stop is −₹303, so the −₹1,000 cap in §3 trips after **3.3 losing
+  trades** — before 3.5 trades/day is reached, on any day that starts badly. At 45%
+  accuracy that is common, not rare. The Monte Carlo in `tools/daily_target.py` does
+  **not** simulate the cap, so its "P(losing month)" figures ignore a rule that would
+  bind often. Whichever way the sizing ruling goes, the cap belongs in the simulation.
 
 - **Verify every rate** in `tools/zerodha_costs.py` against zerodha.com/charges before phase 2.
   A model built on a stale rate is worse than no model.

@@ -4,6 +4,69 @@ Dated, with reasoning. Newest first. A decision reversed keeps its original entr
 
 ---
 
+## 2026-08-23 · Numbers in prose are GENERATED and CHECKED, never typed
+
+**Ruled:** no figure may live in a markdown table by hand. `tools/verify_docs.py`
+recomputes every number the docs assert and **exits 1 on drift**. Rates live in
+exactly one place — `RATES` in `tools/zerodha_costs.py` — and no other tool may
+hardcode one.
+
+**What prompted it.** A full read of this repo on 2026-08-23 found the round-trip
+cost stated as **0.1062%** in `PLAN.md` (×3) and throughout `COST-MODEL.md` §2, §3
+and §4 — while the code, and the rate-correction entry in *this file*, said
+**0.1071%**. The NSE turnover fix (0.00297% → 0.00335%) landed in
+`zerodha_costs.py` and the hand-typed tables were never regenerated. **18 stated
+figures were wrong.** Nothing caught it because nothing was checking.
+
+**The root cause is not the wrong digit.** It is that prose restates numbers the
+code owns, and prose does not recompute itself. That is a structural defect, and
+this repo had already been bitten by the same class of error once — which is what
+the "rates come from the API" ruling was for. That ruling was right and
+insufficient: it fixed where rates come *from*, not where they get *copied to*.
+
+**Three things it now enforces:**
+
+1. **Doc figures are checked at their own printed precision.** "0.1062" claims four
+   decimals, so it must equal `round(model, 4)`. A blanket tolerance would have
+   passed it — 0.0009 looks negligible next to figures like 76.8 — which is exactly
+   how the drift hid.
+2. **One rate table.** `tools/target_test.py` carried its own copy and had gone
+   stale: it still held the **pre-Oct-2024 0.00297%** the correction entry above
+   records as fixed, plus SEBI at ₹20/crore (it is ₹10) and no IPFT at all. It was
+   a *runnable tool* handing out superseded numbers with no warning. Rewritten to
+   import `round_trip`; the check is AST-based so the literal can still be
+   discussed in a docstring.
+3. **Superseded arguments get removed, not left lying.** `target_test.py` also
+   still argued from a **live ₹2,000/month API fee** — killed by the free-tier
+   ruling — and still printed *"more than India's GDP"*, which the target entry
+   above had already corrected to **~82% of it**. Both gone. Overstating a case you
+   are already winning is how a good argument gets dismissed.
+
+**Also added:** `tools/stats.py` — the Wilson score interval that
+`PHASE-1-SPEC.md` §3.2 and §3.3 are both written against and that **nothing in
+this repo implemented.** The spec's own worked example (12/20 → "roughly 39–78%")
+checks out: Wilson gives **38.7–78.1%**.
+
+**Scope, stated plainly: this entry rules on repo hygiene, nothing else.** No rate
+was changed, no rate was verified, and no trading decision was revisited. Every
+rate marked `[?]` in `zerodha_costs.py` — the **₹15.34 DP charge above all**, which
+carries the entire no-small-swings ruling — is still an assumption. Only
+`tools/kite_charges.py` against a live key settles those. A green
+`verify_docs.py` means the docs match the model; **it says nothing about whether
+the model matches Zerodha.**
+
+**NOT ruled here — and it needs one.** The same read found that
+`risk_reward.py` and `daily_target.py` assume a **₹40,000 single position** (all
+₹10,000 of daily capital at 4x), while `PLAN.md` §1 caps a trade at ₹2,000–4,000
+own → ₹4,000–16,000. Every "+₹997 / −₹303 / ~3.5 trades a day" figure — including
+the one quoted as settled in the R:R entry below — depends on the ₹40,000 reading.
+At §1's sizing, ₹1,000/day needs **8.9–17.7 trades/day**, not 3.5. **This is an
+open question, deliberately not decided here** — see `PLAN.md` §8, along with the
+related point that the −₹1,000 daily cap trips after 3.3 losing trades and is
+absent from the Monte Carlo.
+
+---
+
 ## 2026-08-20 · There is a FREE tier — create Personal, defer Connect
 
 **The fact.** The create-app form offers three types, and the ₹2,000/month figure

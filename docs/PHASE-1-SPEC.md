@@ -80,6 +80,10 @@ a number anyone can act on.
 Use the **Wilson score interval**, not the normal approximation, which is badly wrong
 at small n and near the extremes. Print the interval beside every estimate.
 
+**Implemented 2026-08-23 in [`tools/stats.py`](../tools/stats.py)** — `wilson_interval(wins, n)`.
+Until then this section specified a statistic no code in the repo could compute. Run
+`python3 tools/stats.py` for the table that makes the case.
+
 ### 3.3 Judge on the interval floor, never the observed rate
 
 Expectancy is reported three times — at the observed rate, at the CI floor, at the CI
