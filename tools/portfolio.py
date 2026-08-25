@@ -38,6 +38,16 @@ SESSION_MINUTES = 375           # 09:15 to 15:30
 SQUARE_OFF_MIN = 365            # ~15:20, per PLAN.md S3 rule 6
 
 
+def bars_for(minutes, bar_minutes):
+    """Convert a duration in minutes to a count of bars, minimum 1.
+
+    The engine indexes BARS, not clock minutes, so the same Session runs on
+    1-minute synthetic data and on the 15-minute bars Yahoo serves free. Getting
+    this wrong silently rescales every window and box in the model.
+    """
+    return max(1, int(round(minutes / bar_minutes)))
+
+
 @dataclass(frozen=True)
 class MinuteBar:
     minute: int                 # minutes since 09:15
@@ -118,11 +128,14 @@ class Session:
     """One trading day across the allocated symbols."""
 
     def __init__(self, alloc, daily_cap=-1_000.0, window=15, box=30,
-                 target_pct=0.6, stop_pct=0.3):
+                 target_pct=0.6, stop_pct=0.3, bar_minutes=1):
         self.a = alloc
         self.daily_cap = daily_cap
-        self.window = window          # how often entries are considered
-        self.box = box                # time box per trade, in minutes
+        self.bar_minutes = bar_minutes
+        # window/box are given in MINUTES and converted to bar counts here, so
+        # callers express intent in clock time regardless of the data's bar size.
+        self.window = bars_for(window, bar_minutes)
+        self.box = bars_for(box, bar_minutes)
         self.target_pct = target_pct
         self.stop_pct = stop_pct
         self.open_pos = {}
@@ -170,7 +183,7 @@ class Session:
                 self._close(p, stp, minute, "STOP")
             elif minute - p.opened >= p.box_minutes:
                 self._close(p, bar.close, minute, "BOX")
-            elif minute >= SQUARE_OFF_MIN:
+            elif minute >= self._squareoff_bar:
                 self._close(p, bar.close, minute, "SQUAREOFF")
 
     # -- entries -----------------------------------------------------------
@@ -178,7 +191,7 @@ class Session:
         return self.a.capital - self.own_committed
 
     def _try_entries(self, bars, minute, signals):
-        if self.halted or minute >= SQUARE_OFF_MIN - self.box:
+        if self.halted or minute >= self._squareoff_bar - self.box:
             return
         for sym, direction in signals:
             if sym in self.open_pos:
@@ -198,8 +211,14 @@ class Session:
             self.own_committed += own
 
     def run(self, bars, signal_fn):
-        """bars: {symbol: [MinuteBar]}. signal_fn(bars, minute) -> [(sym, dir)]."""
+        """bars: {symbol: [MinuteBar]}. signal_fn(bars, i) -> [(sym, direction)].
+
+        Indices are BAR positions within one session, not clock minutes.
+        """
         n = min(len(b) for b in bars.values())
+        # square off one box before the close, or at the last bar for short
+        # sessions -- never past the end of the data.
+        self._squareoff_bar = min(n - 1, bars_for(SQUARE_OFF_MIN, self.bar_minutes))
         for minute in range(1, n):
             self._check_exits(bars, minute)
             if minute % self.window == 0:
